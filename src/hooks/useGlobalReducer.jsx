@@ -1,5 +1,5 @@
 // Import necessary hooks and functions from React.
-import { useContext, useReducer, createContext } from "react";
+import { useContext, useReducer, createContext, useEffect } from "react";
 import storeReducer, { initialStore } from "../store"  // Import the reducer and the initial state.
 
 // Create a context to hold the global state of the application
@@ -11,7 +11,28 @@ const StoreContext = createContext()
 export function StoreProvider({ children }) {
     // Initialize reducer with the initial state.
     const [store, dispatch] = useReducer(storeReducer, initialStore())
-    // Provide the store and dispatch method to all child components.
+    // Provide the store and dispatc method to all child components.
+
+    useEffect(() => {
+        const getAllCharacaters = async () => {
+            try {
+
+                const response = await fetch(`${store.urlBaseRickAndMorty}/character`)
+                const data = await response.json()
+
+                dispatch({
+                    type: "ADD_CHARACTERS",
+                    payload: data.results
+                })
+
+            } catch (error) {
+                console.log("error: ", error)
+            }
+        }
+        getAllCharacaters()
+    }, [])
+
+
     return <StoreContext.Provider value={{ store, dispatch }}>
         {children}
     </StoreContext.Provider>
